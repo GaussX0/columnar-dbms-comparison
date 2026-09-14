@@ -1,0 +1,40 @@
+Database: clickhouse
+Query: clickhousectl local client --database=default --time 		    --max_bytes_before_external_group_by=22G         	    --max_bytes_before_external_sort=22G 		    --query "        select 	CNTRYCODE, 	count(*) as numcust, 	sum(C_ACCTBAL) as totacctbal from 	( 		select 			substring(C_PHONE from 1 for 2) as cntrycode, 			C_ACCTBAL 		from 			CUSTOMER 		where 			substring(C_PHONE from 1 for 2) in 				('13', '31', '23', '29', '30', '18', '17') 			and C_ACCTBAL > ( 				select 					avg(C_ACCTBAL) 				from 					CUSTOMER 				where 					C_ACCTBAL > 0.00 					and substring(C_PHONE from 1 for 2) in 						('13', '31', '23', '29', '30', '18', '17') 			) 			and not exists ( 				select 					* 				from 					ORDERS 				where 					O_CUSTKEY = C_CUSTKEY 			) 	) as custsale group by 	CNTRYCODE order by 	CNTRYCODE; "
+Execution Times: 0.698, 1.028, 0.687, 1.689, 0.755, 1.637, 1.220, 1.178, 1.801, 0.993, 1.438, 0.904, 0.942, 1.664, 0.693
+RAM Usage: 921.05, 918.38, 920.78, 931.41, 925.12, 925.38, 911.85, 932.07, 914.15, 910.33, 919.96, 926.18, 929.26, 901.66, 910.76
+Disk Operations: 1304, 690, 904, 1092, 830, 1222, 824, 998, 1322, 1232, 1078, 848, 878, 1186, 828
+Disk Volume: 72.29, 64.50, 65.80, 67.51, 64.54, 67.39, 63.47, 64.93, 83.23, 69.93, 67.48, 74.82, 59.31, 68.51, 64.92
+Averages: Execution Time: 1.155s, RAM: 919.89MB, Disk Ops: 1016, Disk Vol: 67.91MB
+--------------------------------------------------------------------------------
+Database: duckdb
+Query: duckdb tpch.duckdb -c '.timer on' -c "        select 	cntrycode, 	count(*) as numcust, 	sum(c_acctbal) as totacctbal from 	( 		select 			substring(c_phone from 1 for 2) as cntrycode, 			c_acctbal 		from 			CUSTOMER 		where 			substring(c_phone from 1 for 2) in 				('13', '31', '23', '29', '30', '18', '17') 			and c_acctbal > ( 				select 					avg(c_acctbal) 				from 					CUSTOMER 				where 					c_acctbal > 0.00 					and substring(c_phone from 1 for 2) in 						('13', '31', '23', '29', '30', '18', '17') 			) 			and not exists ( 				select 					* 				from 					ORDERS 				where 					o_custkey = c_custkey 			) 	) as custsale group by 	cntrycode order by 	cntrycode; "
+Execution Times: 1.500, 0.975, 0.994, 1.019, 1.016, 1.163, 0.918, 0.973, 1.112, 1.082, 1.075, 1.196, 0.985, 0.922, 0.804
+RAM Usage: 119.52, 118.76, 122.87, 121.54, 122.90, 125.32, 122.40, 128.97, 121.50, 126.87, 120.35, 120.79, 125.82, 122.64, 123.96
+Disk Operations: 1548, 1348, 1558, 1400, 1506, 1360, 1372, 1436, 1488, 1468, 1434, 1542, 1478, 1424, 1322
+Disk Volume: 177.11, 175.70, 180.14, 175.89, 179.20, 176.46, 178.12, 178.47, 179.22, 177.31, 175.97, 179.91, 176.62, 178.21, 175.79
+Averages: Execution Time: 1.049s, RAM: 122.95MB, Disk Ops: 1446, Disk Vol: 177.61MB
+--------------------------------------------------------------------------------
+Database: mariadb
+Query: mariadb -u root --password=qwerty -vvv -D thesis -e "        select 	cntrycode, 	count(*) as numcust, 	sum(c_acctbal) as totacctbal from 	( 		select 			substring(c_phone from 1 for 2) as cntrycode, 			c_acctbal 		from 			CUSTOMER 		where 			substring(c_phone from 1 for 2) in 				('13', '31', '23', '29', '30', '18', '17') 			and c_acctbal > ( 				select 					avg(c_acctbal) 				from 					CUSTOMER 				where 					c_acctbal > 0.00 					and substring(c_phone from 1 for 2) in 						('13', '31', '23', '29', '30', '18', '17') 			) 			and not exists ( 				select 					* 				from 					ORDERS 				where 					o_custkey = c_custkey 			) 	) as custsale group by 	cntrycode order by 	cntrycode; "
+Execution Times: 4.424, 3.922, 3.578, 4.011, 4.240, 4.293, 4.293, 4.127, 4.726, 5.009, 3.950, 4.344, 4.305, 3.887, 3.441
+RAM Usage: 2555.12, 2554.54, 2557.85, 2544.08, 2545.03, 2537.61, 2541.39, 2559.00, 2543.46, 2540.21, 2563.14, 2543.48, 2568.84, 2577.80, 2556.96
+Disk Operations: 3406, 2052, 1780, 2786, 3286, 3052, 3278, 2934, 3288, 2812, 2480, 2522, 2842, 3182, 3194
+Disk Volume: 225.85, 241.33, 220.41, 223.70, 235.32, 226.72, 225.97, 223.82, 223.25, 226.92, 220.34, 256.28, 242.63, 233.63, 243.66
+Averages: Execution Time: 4.170s, RAM: 2552.57MB, Disk Ops: 2860, Disk Vol: 231.32MB
+--------------------------------------------------------------------------------
+Database: monetdb
+Query: sudo mclient -d thesis -t performance -s "        select 	cntrycode, 	count(*) as numcust, 	sum(c_acctbal) as totacctbal from 	( 		select 			substring(c_phone from 1 for 2) as cntrycode, 			c_acctbal 		from 			CUSTOMER 		where 			substring(c_phone from 1 for 2) in 				('13', '31', '23', '29', '30', '18', '17') 			and c_acctbal > ( 				select 					avg(c_acctbal) 				from 					CUSTOMER 				where 					c_acctbal > 0.00 					and substring(c_phone from 1 for 2) in 						('13', '31', '23', '29', '30', '18', '17') 			) 			and not exists ( 				select 					* 				from 					ORDERS 				where 					o_custkey = c_custkey 			) 	) as custsale group by 	cntrycode order by 	cntrycode; "
+Execution Times: 7.014, 4.864, 4.726, 5.100, 5.843, 5.064, 4.962, 5.299, 4.949, 4.608, 4.304, 4.855, 4.901, 4.726, 5.273
+RAM Usage: 575.19, 578.24, 573.53, 558.88, 574.69, 575.03, 567.11, 573.04, 545.86, 575.02, 575.11, 571.15, 556.31, 571.50, 567.91
+Disk Operations: 12980, 13072, 12740, 12764, 12868, 12544, 12602, 12742, 12588, 12812, 12730, 12914, 12558, 12706, 13040
+Disk Volume: 1311.03, 1304.20, 1305.32, 1297.53, 1300.02, 1292.37, 1295.22, 1294.53, 1298.88, 1294.96, 1295.83, 1299.22, 1296.17, 1295.05, 1291.87
+Averages: Execution Time: 5.099s, RAM: 569.24MB, Disk Ops: 12777, Disk Vol: 1298.15MB
+--------------------------------------------------------------------------------
+Database: timescaledb
+Query: psql -d thesis -c '\timing' -c "        select 	cntrycode, 	count(*) as numcust, 	sum(c_acctbal) as totacctbal from 	( 		select 			substring(c_phone from 1 for 2) as cntrycode, 			c_acctbal 		from 			CUSTOMER 		where 			substring(c_phone from 1 for 2) in 				('13', '31', '23', '29', '30', '18', '17') 			and c_acctbal > ( 				select 					avg(c_acctbal) 				from 					CUSTOMER 				where 					c_acctbal > 0.00 					and substring(c_phone from 1 for 2) in 						('13', '31', '23', '29', '30', '18', '17') 			) 			and not exists ( 				select 					* 				from 					ORDERS 				where 					o_custkey = c_custkey 			) 	) as custsale group by 	cntrycode order by 	cntrycode; "
+Execution Times: 17.298, 17.916, 17.919, 17.720, 16.731, 17.741, 19.967, 24.904, 21.182, 20.585, 28.810, 27.579, 20.329, 20.804, 20.759
+RAM Usage: 4879.58, 4883.16, 4827.62, 4865.79, 4960.22, 4760.92, 4823.23, 4848.81, 4955.74, 4782.03, 4786.25, 4772.77, 4843.14, 4928.13, 4788.60
+Disk Operations: 41736, 41888, 42194, 42246, 41554, 41980, 41946, 41778, 45024, 41916, 41608, 41784, 41782, 42098, 41814
+Disk Volume: 4687.44, 4687.70, 4693.21, 4692.68, 4689.02, 4692.83, 4691.50, 4688.89, 4710.42, 4692.03, 4690.85, 4688.79, 4688.32, 4693.00, 4690.55
+Averages: Execution Time: 20.683s, RAM: 4847.07MB, Disk Ops: 42090, Disk Vol: 4691.82MB
+--------------------------------------------------------------------------------

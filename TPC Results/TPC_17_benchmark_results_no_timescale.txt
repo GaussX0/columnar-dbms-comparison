@@ -1,0 +1,32 @@
+Database: clickhouse
+Query: clickhousectl local client --database=default --time 		    --max_bytes_before_external_group_by=22G         	    --max_bytes_before_external_sort=22G 		    --query "        select 	sum(L_EXTENDEDPRICE) / 7.0 as avg_yearly from 	LINEITEM, 	PART where 	P_PARTKEY = L_PARTKEY 	and P_BRAND = 'Brand#23' 	and P_CONTAINER = 'MED BOX' 	and L_QUANTITY < ( 		select 			0.2 * avg(L_QUANTITY) 		from 			LINEITEM 		where 			L_PARTKEY = P_PARTKEY 	); "
+Execution Times: 16.997, 17.026, 19.952, 15.854, 18.067, 17.573, 18.269, 17.424, 17.089, 16.297, 13.558, 12.983, 14.240, 17.684, 16.569
+RAM Usage: 3466.79, 3527.76, 3574.28, 3600.89, 3527.13, 3517.17, 3544.94, 3526.59, 3540.53, 3547.58, 3522.94, 3501.07, 3482.72, 3531.55, 3490.39
+Disk Operations: 22706, 22196, 23100, 22300, 22684, 21986, 22664, 22158, 21990, 21812, 21194, 22340, 21302, 23296, 22090
+Disk Volume: 2398.01, 2401.60, 2439.36, 2420.12, 2417.14, 2369.96, 2385.89, 2355.78, 2381.14, 2355.31, 2376.04, 2416.11, 2369.33, 2427.86, 2371.34
+Averages: Execution Time: 16.639s, RAM: 3526.82MB, Disk Ops: 22254, Disk Vol: 2392.33MB
+--------------------------------------------------------------------------------
+Database: duckdb
+Query: duckdb tpch.duckdb -c '.timer on' -c "        select 	sum(l_extendedprice) / 7.0 as avg_yearly from 	LINEITEM, 	PART where 	p_partkey = l_partkey 	and p_brand = 'Brand#23' 	and p_container = 'MED BOX' 	and l_quantity < ( 		select 			0.2 * avg(l_quantity) 		from 			LINEITEM 		where 			l_partkey = p_partkey 	); "
+Execution Times: 4.832, 4.406, 4.221, 4.405, 4.016, 4.322, 4.532, 3.675, 3.940, 3.675, 3.970, 3.763, 3.898, 3.523, 3.559
+RAM Usage: 525.17, 524.12, 524.53, 496.18, 506.03, 519.55, 512.87, 520.15, 519.55, 513.63, 508.25, 527.00, 507.45, 501.69, 519.35
+Disk Operations: 4884, 5208, 5200, 5274, 5194, 5146, 4922, 5108, 5040, 5054, 5176, 5050, 5218, 4736, 5118
+Disk Volume: 990.54, 1010.90, 1006.39, 1011.45, 1003.86, 1010.67, 1005.53, 1006.16, 997.61, 1006.64, 1008.24, 1007.05, 1011.25, 991.29, 1010.60
+Averages: Execution Time: 4.049s, RAM: 515.03MB, Disk Ops: 5089, Disk Vol: 1005.21MB
+--------------------------------------------------------------------------------
+Database: mariadb
+Query: mariadb -u root --password=qwerty -vvv -D thesis -e "        select 	sum(l_extendedprice) / 7.0 as avg_yearly from 	LINEITEM, 	PART where 	p_partkey = l_partkey 	and p_brand = 'Brand#23' 	and p_container = 'MED BOX' 	and l_quantity < ( 		select 			0.2 * avg(l_quantity) 		from 			LINEITEM 		where 			l_partkey = p_partkey 	); "
+Execution Times: 83.448, 77.589, 81.018, 82.597, 77.786, 75.727, 65.639, 65.876, 69.073, 66.954, 64.446, 72.070, 66.359, 63.309, 68.741
+RAM Usage: 2501.76, 2516.60, 2555.74, 2557.05, 2517.81, 2546.78, 2513.56, 2450.64, 2548.82, 2492.67, 2489.10, 2568.20, 2537.51, 2502.49, 2508.69
+Disk Operations: 6828, 5360, 4518, 5640, 6586, 5422, 5172, 5172, 3690, 7918, 5556, 5102, 3568, 3566, 5394
+Disk Volume: 1449.92, 1496.87, 1470.23, 1429.98, 1452.05, 1444.96, 1406.69, 1443.47, 1456.41, 1481.33, 1427.46, 1432.95, 1426.72, 1410.49, 1478.23
+Averages: Execution Time: 72.042s, RAM: 2520.49MB, Disk Ops: 5299, Disk Vol: 1447.18MB
+--------------------------------------------------------------------------------
+Database: monetdb
+Query: sudo mclient -d thesis -t performance -s "        select 	sum(l_extendedprice) / 7.0 as avg_yearly from 	LINEITEM, 	PART where 	p_partkey = l_partkey 	and p_brand = 'Brand#23' 	and p_container = 'MED BOX' 	and l_quantity < ( 		select 			0.2 * avg(l_quantity) 		from 			LINEITEM 		where 			l_partkey = p_partkey 	); "
+Execution Times: 4.495, 4.917, 4.830, 4.534, 4.629, 4.701, 5.617, 4.854, 4.764, 4.976, 4.957, 5.372, 4.925, 5.072, 6.100
+RAM Usage: 971.48, 977.21, 976.92, 962.28, 980.08, 973.09, 985.45, 980.41, 964.34, 948.26, 985.30, 979.66, 975.28, 985.54, 976.35
+Disk Operations: 22124, 22536, 22600, 22528, 22326, 22542, 22720, 22350, 22468, 22478, 22456, 22800, 22476, 22454, 22412
+Disk Volume: 2132.82, 2151.21, 2141.18, 2141.60, 2132.43, 2148.27, 2149.30, 2144.78, 2144.47, 2141.92, 2148.52, 2147.98, 2145.63, 2148.63, 2141.16
+Averages: Execution Time: 4.983s, RAM: 974.78MB, Disk Ops: 22485, Disk Vol: 2143.99MB
+--------------------------------------------------------------------------------

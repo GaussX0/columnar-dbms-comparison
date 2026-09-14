@@ -1,0 +1,40 @@
+Database: clickhouse
+Query: clickhousectl local client --database=default --time 		    --max_bytes_before_external_group_by=22G         	    --max_bytes_before_external_sort=22G 		    --query "        select 	L_RETURNFLAG, 	L_LINESTATUS, 	sum(L_QUANTITY) as sum_qty, 	sum(L_EXTENDEDPRICE) as sum_base_price, 	sum(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) as sum_disc_price, 	sum(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) as sum_charge, 	avg(L_QUANTITY) as avg_qty, 	avg(L_EXTENDEDPRICE) as avg_price, 	avg(L_DISCOUNT) as avg_disc, 	count(*) as count_order from 	LINEITEM where 	L_SHIPDATE <= date '1998-12-01' - interval '90' day group by 	L_RETURNFLAG, 	L_LINESTATUS order by 	L_RETURNFLAG, 	L_LINESTATUS; "
+Execution Times: 5.674, 6.881, 6.554, 5.166, 5.540, 5.707, 5.962, 5.000, 6.428, 6.459, 7.097, 6.505, 5.858, 7.376, 7.468
+RAM Usage: 836.10, 834.90, 840.11, 844.19, 840.24, 835.08, 839.22, 835.94, 845.02, 841.18, 843.99, 839.42, 842.82, 837.73, 840.26
+Disk Operations: 16492, 16238, 16356, 16204, 16194, 16208, 16288, 16122, 16162, 16176, 16308, 16070, 16228, 16182, 16100
+Disk Volume: 1891.41, 1885.16, 1885.79, 1889.55, 1883.29, 1889.42, 1886.29, 1879.06, 1880.10, 1884.67, 1882.16, 1880.10, 1885.14, 1883.41, 1885.71
+Averages: Execution Time: 6.245s, RAM: 839.75MB, Disk Ops: 16222, Disk Vol: 1884.75MB
+--------------------------------------------------------------------------------
+Database: duckdb
+Query: duckdb tpch.duckdb -c '.timer on' -c "        select 	l_returnflag, 	l_linestatus, 	sum(l_quantity) as sum_qty, 	sum(l_extendedprice) as sum_base_price, 	sum(l_extendedprice * (1 - l_discount)) as sum_disc_price, 	sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) as sum_charge, 	avg(l_quantity) as avg_qty, 	avg(l_extendedprice) as avg_price, 	avg(l_discount) as avg_disc, 	count(*) as count_order from 	LINEITEM where 	l_shipdate <= date '1998-12-01' - interval '90' day group by 	l_returnflag, 	l_linestatus order by 	l_returnflag, 	l_linestatus ; "
+Execution Times: 4.410, 2.261, 2.101, 2.403, 2.379, 2.239, 2.031, 2.282, 2.562, 2.840, 2.998, 2.620, 2.694, 3.471, 2.341
+RAM Usage: 563.51, 517.96, 553.45, 563.42, 548.11, 528.46, 548.11, 567.09, 563.30, 541.42, 567.28, 548.93, 533.93, 566.16, 555.35
+Disk Operations: 6822, 5990, 5394, 5784, 5780, 5358, 5436, 5304, 5416, 5426, 5474, 5412, 5462, 5548, 5414
+Disk Volume: 1157.10, 1148.34, 1116.25, 1143.46, 1144.50, 1115.50, 1118.77, 1116.64, 1120.03, 1116.53, 1122.10, 1114.79, 1117.92, 1117.63, 1113.89
+Averages: Execution Time: 2.642s, RAM: 551.10MB, Disk Ops: 5601, Disk Vol: 1125.56MB
+--------------------------------------------------------------------------------
+Database: mariadb
+Query: mariadb -u root --password=qwerty -vvv -D thesis -e "        SELECT 	L_RETURNFLAG, 	L_LINESTATUS, 	SUM(L_QUANTITY) AS SUM_QTY, 	SUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE, 	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE, 	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE, 	AVG(L_QUANTITY) AS AVG_QTY, 	AVG(L_EXTENDEDPRICE) AS AVG_PRICE, 	AVG(L_DISCOUNT) AS AVG_DISC, 	COUNT(*) AS COUNT_ORDER FROM 	LINEITEM WHERE 	L_SHIPDATE <= DATE '1998-12-01' - INTERVAL '90' DAY GROUP BY 	L_RETURNFLAG, 	L_LINESTATUS ORDER BY 	L_RETURNFLAG, 	L_LINESTATUS; ; "
+Execution Times: 15.122, 9.029, 8.175, 8.910, 8.898, 8.332, 8.840, 7.995, 8.582, 8.518, 8.251, 8.968, 8.937, 9.032, 8.016
+RAM Usage: 3420.66, 3441.10, 3453.31, 3446.47, 3438.08, 3450.53, 3459.10, 3445.26, 3462.68, 3449.50, 3439.80, 3450.08, 3429.37, 3472.17, 3445.57
+Disk Operations: 3312, 3214, 3170, 3246, 3298, 3240, 3198, 3172, 3182, 3168, 3178, 3190, 3166, 3156, 3174
+Disk Volume: 1826.78, 1893.12, 1873.39, 1894.85, 1926.91, 1876.92, 1884.27, 1884.00, 1879.15, 1879.86, 1877.57, 1856.74, 1880.58, 1895.90, 1896.60
+Averages: Execution Time: 9.040s, RAM: 3446.91MB, Disk Ops: 3204, Disk Vol: 1881.78MB
+--------------------------------------------------------------------------------
+Database: monetdb
+Query: sudo mclient -d thesis -t performance -s "        SELECT 	L_RETURNFLAG, 	L_LINESTATUS, 	SUM(L_QUANTITY) AS SUM_QTY, 	SUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE, 	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE, 	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE, 	AVG(L_QUANTITY) AS AVG_QTY, 	AVG(L_EXTENDEDPRICE) AS AVG_PRICE, 	AVG(L_DISCOUNT) AS AVG_DISC, 	COUNT(*) AS COUNT_ORDER FROM 	LINEITEM WHERE 	L_SHIPDATE <= DATE '1998-12-01' - INTERVAL '90' DAY GROUP BY 	L_RETURNFLAG, 	L_LINESTATUS ORDER BY 	L_RETURNFLAG, 	L_LINESTATUS; ; "
+Execution Times: 9.521, 8.833, 8.442, 8.402, 8.171, 9.564, 9.441, 9.432, 9.052, 8.269, 8.916, 8.439, 8.982, 8.171, 10.232
+RAM Usage: 5257.33, 5209.83, 5158.71, 5160.83, 5244.27, 5382.39, 5270.08, 5261.56, 5187.91, 5292.60, 5280.35, 5371.32, 5279.74, 5199.43, 5224.56
+Disk Operations: 40914, 40466, 40308, 40412, 40416, 40578, 39914, 40284, 40348, 39962, 40418, 40288, 39966, 40248, 39924
+Disk Volume: 4363.67, 4356.14, 4362.46, 4362.39, 4362.31, 4363.44, 4360.50, 4362.02, 4359.48, 4360.69, 4362.52, 4362.46, 4361.12, 4356.39, 4360.90
+Averages: Execution Time: 8.924s, RAM: 5252.06MB, Disk Ops: 40296, Disk Vol: 4361.10MB
+--------------------------------------------------------------------------------
+Database: timescaledb
+Query: psql -d thesis -c '\timing' -c "        SELECT 	L_RETURNFLAG, 	L_LINESTATUS, 	SUM(L_QUANTITY) AS SUM_QTY, 	SUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE, 	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE, 	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE, 	AVG(L_QUANTITY) AS AVG_QTY, 	AVG(L_EXTENDEDPRICE) AS AVG_PRICE, 	AVG(L_DISCOUNT) AS AVG_DISC, 	COUNT(*) AS COUNT_ORDER FROM 	LINEITEM WHERE 	L_SHIPDATE <= DATE '1998-12-01' - INTERVAL '90' DAY GROUP BY 	L_RETURNFLAG, 	L_LINESTATUS ORDER BY 	L_RETURNFLAG, 	L_LINESTATUS ; "
+Execution Times: 58.614, 47.213, 45.636, 45.820, 45.626, 51.511, 47.006, 44.137, 49.199, 48.033, 50.647, 54.856, 49.806, 53.458, 49.226
+RAM Usage: 14842.49, 14429.50, 14444.22, 14420.99, 14434.32, 14254.85, 14400.91, 14452.08, 14220.48, 14392.02, 14440.30, 14445.16, 14459.40, 14428.14, 14450.36
+Disk Operations: 155466, 152816, 153342, 152812, 153328, 164434, 156128, 150754, 153486, 157961, 152338, 150176, 150444, 145900, 150736
+Disk Volume: 17611.10, 17602.28, 17603.19, 17615.88, 17648.82, 17792.58, 17796.68, 17577.88, 17629.15, 17825.21, 17609.76, 17559.28, 17578.71, 17507.42, 17596.67
+Averages: Execution Time: 49.386s, RAM: 14434.30MB, Disk Ops: 153341, Disk Vol: 17637.00MB
+--------------------------------------------------------------------------------

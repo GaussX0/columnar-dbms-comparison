@@ -1,0 +1,40 @@
+Database: clickhouse
+Query: clickhousectl local client --database=default --time 		    --max_bytes_before_external_group_by=22G         	    --max_bytes_before_external_sort=22G 		    --query "        select 	S_NAME, 	count(*) as NUMWAIT from 	SUPPLIER, 	LINEITEM l1, 	ORDERS, 	NATION where 	S_SUPPKEY = l1.L_SUPPKEY 	and O_ORDERKEY = l1.L_ORDERKEY 	and O_ORDERSTATUS = 'F' 	and l1.L_RECEIPTDATE > l1.L_COMMITDATE 	and exists ( 		select 			* 		from 			LINEITEM l2 		where 			l2.L_ORDERKEY = l1.L_ORDERKEY 			and l2.L_SUPPKEY <> l1.L_SUPPKEY 	) 	and not exists ( 		select 			* 		from 			LINEITEM l3 		where 			l3.L_ORDERKEY = l1.L_ORDERKEY 			and l3.L_SUPPKEY <> l1.L_SUPPKEY 			and l3.L_RECEIPTDATE > l3.L_COMMITDATE 	) 	and S_NATIONKEY = N_NATIONKEY 	and N_NAME = 'SAUDI ARABIA' group by 	S_NAME order by 	NUMWAIT desc, 	S_NAME limit 100; "
+Execution Times: 12.552, 9.632, 12.380, 13.503, 10.240, 9.050, 19.251, 17.230, 21.089, 11.587, 21.597, 12.539, 16.344, 21.443, 17.481
+RAM Usage: 3924.68, 3947.28, 3930.84, 3935.09, 3963.62, 3984.77, 3960.23, 3960.74, 3884.84, 3975.87, 3909.32, 3983.04, 3927.66, 3919.08, 3953.01
+Disk Operations: 16410, 14662, 13762, 14510, 13206, 12000, 16422, 13466, 13518, 11856, 14800, 12580, 14442, 12902, 13696
+Disk Volume: 1400.98, 1386.22, 1263.27, 1280.17, 1246.77, 1264.86, 1393.35, 1292.81, 1290.89, 1197.81, 1458.51, 1216.80, 1250.14, 1255.47, 1238.50
+Averages: Execution Time: 15.061s, RAM: 3944.00MB, Disk Ops: 13882, Disk Vol: 1295.77MB
+--------------------------------------------------------------------------------
+Database: duckdb
+Query: duckdb tpch.duckdb -c '.timer on' -c "        select 	s_name, 	count(*) as numwait from 	SUPPLIER, 	LINEITEM l1, 	ORDERS, 	NATION where 	s_suppkey = l1.l_suppkey 	and o_orderkey = l1.l_orderkey 	and o_orderstatus = 'F' 	and l1.l_receiptdate > l1.l_commitdate 	and exists ( 		select 			* 		from 			LINEITEM l2 		where 			l2.l_orderkey = l1.l_orderkey 			and l2.l_suppkey <> l1.l_suppkey 	) 	and not exists ( 		select 			* 		from 			LINEITEM l3 		where 			l3.l_orderkey = l1.l_orderkey 			and l3.l_suppkey <> l1.l_suppkey 			and l3.l_receiptdate > l3.l_commitdate 	) 	and s_nationkey = n_nationkey 	and n_name = 'SAUDI ARABIA' group by 	s_name order by 	numwait desc, 	s_name limit 100; "
+Execution Times: 8.631, 8.049, 8.508, 7.328, 8.101, 8.881, 8.150, 7.755, 7.396, 8.573, 8.082, 8.003, 7.430, 7.150, 7.115
+RAM Usage: 749.02, 778.81, 776.44, 807.14, 779.08, 804.09, 772.66, 775.35, 754.27, 773.15, 775.43, 774.58, 779.00, 769.74, 761.85
+Disk Operations: 5686, 6000, 6074, 5908, 5808, 6006, 6110, 5950, 5502, 6296, 6040, 6014, 5872, 5774, 5786
+Disk Volume: 1015.69, 1018.07, 1026.21, 1023.81, 1019.54, 1026.29, 1028.96, 1025.93, 1014.34, 1027.99, 1028.85, 1026.70, 1022.93, 1022.58, 1026.62
+Averages: Execution Time: 7.943s, RAM: 775.37MB, Disk Ops: 5922, Disk Vol: 1023.63MB
+--------------------------------------------------------------------------------
+Database: mariadb
+Query: mariadb -u root --password=qwerty -vvv -D thesis -e "        select 	s_name, 	count(*) as numwait from 	SUPPLIER, 	LINEITEM l1, 	ORDERS, 	NATION where 	s_suppkey = l1.l_suppkey 	and o_orderkey = l1.l_orderkey 	and o_orderstatus = 'F' 	and l1.l_receiptdate > l1.l_commitdate 	and exists ( 		select 			* 		from 			LINEITEM l2 		where 			l2.l_orderkey = l1.l_orderkey 			and l2.l_suppkey <> l1.l_suppkey 	) 	and not exists ( 		select 			* 		from 			LINEITEM l3 		where 			l3.l_orderkey = l1.l_orderkey 			and l3.l_suppkey <> l1.l_suppkey 			and l3.l_receiptdate > l3.l_commitdate 	) 	and s_nationkey = n_nationkey 	and n_name = 'SAUDI ARABIA' group by 	s_name order by 	numwait desc, 	s_name limit 100; "
+Execution Times: 26.166, 13.454, 16.475, 14.824, 16.605, 16.613, 16.927, 15.465, 17.163, 13.559, 14.297, 16.226, 14.127, 17.379, 16.950
+RAM Usage: 13521.17, 13616.04, 13510.45, 13638.68, 13569.96, 13559.00, 13610.65, 13648.04, 13573.17, 13700.26, 13742.52, 13614.49, 13587.86, 13635.06, 13599.45
+Disk Operations: 7720, 5170, 3088, 7422, 7410, 7720, 7702, 3826, 6512, 7412, 4846, 4392, 7724, 3954, 3852
+Disk Volume: 1599.58, 1611.15, 1538.52, 1590.07, 1576.10, 1576.63, 1590.67, 1593.60, 1562.71, 1578.25, 1532.18, 1574.18, 1602.09, 1569.07, 1540.65
+Averages: Execution Time: 16.415s, RAM: 13608.50MB, Disk Ops: 5917, Disk Vol: 1575.70MB
+--------------------------------------------------------------------------------
+Database: monetdb
+Query: sudo mclient -d thesis -t performance -s "        select 	s_name, 	count(*) as numwait from 	SUPPLIER, 	LINEITEM l1, 	ORDERS, 	NATION where 	s_suppkey = l1.l_suppkey 	and o_orderkey = l1.l_orderkey 	and o_orderstatus = 'F' 	and l1.l_receiptdate > l1.l_commitdate 	and exists ( 		select 			* 		from 			LINEITEM l2 		where 			l2.l_orderkey = l1.l_orderkey 			and l2.l_suppkey <> l1.l_suppkey 	) 	and not exists ( 		select 			* 		from 			LINEITEM l3 		where 			l3.l_orderkey = l1.l_orderkey 			and l3.l_suppkey <> l1.l_suppkey 			and l3.l_receiptdate > l3.l_commitdate 	) 	and s_nationkey = n_nationkey 	and n_name = 'SAUDI ARABIA' group by 	s_name order by 	numwait desc, 	s_name limit 100; "
+Execution Times: 13.444, 13.276, 12.704, 12.732, 12.789, 12.915, 15.294, 15.567, 13.174, 12.944, 12.977, 13.562, 12.918, 12.236, 13.767
+RAM Usage: 2344.09, 2395.75, 2331.21, 2303.85, 2337.98, 2351.06, 2319.91, 2337.83, 2339.97, 2340.95, 2335.00, 2344.53, 2300.33, 2511.71, 2345.88
+Disk Operations: 34832, 34940, 34874, 34872, 34920, 35142, 42058, 34774, 35014, 34996, 34750, 35358, 35236, 34610, 34870
+Disk Volume: 3850.69, 3853.92, 3837.78, 3851.28, 3853.90, 3853.64, 3934.96, 3855.89, 3848.18, 3847.13, 3850.39, 3851.92, 3864.95, 3841.51, 3864.11
+Averages: Execution Time: 13.353s, RAM: 2349.34MB, Disk Ops: 35416, Disk Vol: 3857.35MB
+--------------------------------------------------------------------------------
+Database: timescaledb
+Query: psql -d thesis -c '\timing' -c "        select 	s_name, 	count(*) as numwait from 	SUPPLIER, 	LINEITEM l1, 	ORDERS, 	NATION where 	s_suppkey = l1.l_suppkey 	and o_orderkey = l1.l_orderkey 	and o_orderstatus = 'F' 	and l1.l_receiptdate > l1.l_commitdate 	and exists ( 		select 			* 		from 			LINEITEM l2 		where 			l2.l_orderkey = l1.l_orderkey 			and l2.l_suppkey <> l1.l_suppkey 	) 	and not exists ( 		select 			* 		from 			LINEITEM l3 		where 			l3.l_orderkey = l1.l_orderkey 			and l3.l_suppkey <> l1.l_suppkey 			and l3.l_receiptdate > l3.l_commitdate 	) 	and s_nationkey = n_nationkey 	and n_name = 'SAUDI ARABIA' group by 	s_name order by 	numwait desc, 	s_name limit 100; "
+Execution Times: 221.255, 222.242, 234.503, 256.542, 218.085, 226.511, 215.957, 231.484, 203.813, 225.822, 264.406, 270.362, 292.299, 244.479, 205.548
+RAM Usage: 34004.39, 34150.74, 34089.51, 34076.81, 34082.42, 34031.53, 34146.84, 34019.95, 34143.69, 34123.25, 34062.75, 34035.43, 34020.21, 34357.66, 34242.89
+Disk Operations: 532940, 533498, 532632, 535734, 535830, 531682, 530546, 532798, 532766, 538482, 532596, 533127, 533608, 531702, 535204
+Disk Volume: 62476.61, 62550.58, 62481.39, 62449.49, 62394.25, 62409.08, 62360.19, 62519.47, 62469.25, 62443.39, 62426.64, 62511.65, 62520.45, 62460.23, 62458.92
+Averages: Execution Time: 235.554s, RAM: 34105.90MB, Disk Ops: 533543, Disk Vol: 62462.10MB
+--------------------------------------------------------------------------------

@@ -1,0 +1,32 @@
+Database: clickhouse
+Query: clickhousectl local client --database=default --time 		    --max_bytes_before_external_group_by=22G         	    --max_bytes_before_external_sort=22G 		    --query "        select 	S_NAME, 	S_ADDRESS from 	SUPPLIER, 	NATION where 	S_SUPPKEY in ( 		select 			PS_SUPPKEY 		from 			PARTSUPP 		where 			PS_PARTKEY in ( 				select 					P_PARTKEY 				from 					PART 				where 					P_NAME like 'forest%' 			) 			and PS_AVAILQTY > ( 				select 					0.5 * sum(L_QUANTITY) 				from 					LINEITEM 				where 					L_PARTKEY = PS_PARTKEY 					and L_SUPPKEY = PS_SUPPKEY 					and L_SHIPDATE >= date '1994-01-01' 					and L_SHIPDATE < date '1994-01-01' + interval '1' year 			) 	) 	and S_NATIONKEY = N_NATIONKEY 	and N_NAME = 'CANADA' order by 	S_NAME; "
+Execution Times: 7.399, 7.000, 7.504, 7.900, 8.260, 7.711, 6.673, 7.052, 7.303, 7.805, 9.951, 10.754, 12.195, 12.628, 11.884
+RAM Usage: 967.03, 975.78, 976.69, 987.76, 964.51, 965.09, 980.44, 973.88, 979.11, 967.07, 980.69, 978.72, 974.54, 971.45, 971.34
+Disk Operations: 15116, 14770, 14418, 14446, 14596, 15142, 14782, 14432, 14864, 14276, 14824, 14664, 14466, 15610, 14730
+Disk Volume: 1731.05, 1709.35, 1704.03, 1713.01, 1704.25, 1721.26, 1715.35, 1703.17, 1708.53, 1703.16, 1713.81, 1714.50, 1709.34, 1731.08, 1711.45
+Averages: Execution Time: 8.801s, RAM: 974.27MB, Disk Ops: 14742, Disk Vol: 1712.89MB
+--------------------------------------------------------------------------------
+Database: duckdb
+Query: duckdb tpch.duckdb -c '.timer on' -c "        select 	s_name, 	s_address from 	SUPPLIER, 	NATION where 	s_suppkey in ( 		select 			ps_suppkey 		from 			PARTSUPP 		where 			ps_partkey in ( 				select 					p_partkey 				from 					PART 				where 					p_name like 'forest%' 			) 			and ps_availqty > ( 				select 					0.5 * sum(l_quantity) 				from 					LINEITEM 				where 					l_partkey = ps_partkey 					and l_suppkey = ps_suppkey 					and l_shipdate >= date '1994-01-01' 					and l_shipdate < date '1994-01-01' + interval '1' year 			) 	) 	and s_nationkey = n_nationkey 	and n_name = 'CANADA' order by 	s_name; "
+Execution Times: 10.939, 10.494, 9.369, 9.383, 10.449, 11.072, 10.778, 10.035, 10.076, 9.718, 9.180, 11.275, 11.552, 12.457, 10.457
+RAM Usage: 654.78, 647.18, 650.13, 657.37, 655.71, 649.35, 651.04, 642.27, 643.71, 648.86, 654.82, 647.22, 655.57, 657.46, 647.46
+Disk Operations: 6736, 6982, 6826, 6624, 6714, 6863, 6542, 6950, 6680, 6756, 6526, 6714, 6434, 6332, 6870
+Disk Volume: 1237.57, 1243.87, 1239.45, 1241.78, 1239.83, 1241.71, 1238.17, 1243.37, 1240.82, 1239.33, 1237.39, 1241.31, 1236.50, 1239.82, 1241.16
+Averages: Execution Time: 10.482s, RAM: 650.86MB, Disk Ops: 6703, Disk Vol: 1240.14MB
+--------------------------------------------------------------------------------
+Database: mariadb
+Query: mariadb -u root --password=qwerty -vvv -D thesis -e "        select 	s_name, 	s_address from 	SUPPLIER, 	NATION where 	s_suppkey in ( 		select 			ps_suppkey 		from 			PARTSUPP 		where 			ps_partkey in ( 				select 					p_partkey 				from 					PART 				where 					p_name like 'forest%' 			) 			and ps_availqty > ( 				select 					0.5 * sum(l_quantity) 				from 					LINEITEM 				where 					l_partkey = ps_partkey 					and l_suppkey = ps_suppkey 					and l_shipdate >= date '1994-01-01' 					and l_shipdate < date '1994-01-01' + interval '1' year 			) 	) 	and s_nationkey = n_nationkey 	and n_name = 'CANADA' order by 	s_name; "
+Execution Times: 29.468, 31.154, 30.712, 31.553, 30.538, 29.073, 30.619, 33.235, 29.570, 28.920, 30.778, 28.430, 30.527, 18.721, 21.396
+RAM Usage: 3807.92, 3710.64, 3716.60, 3701.96, 3729.03, 3709.79, 3734.34, 3691.10, 3721.89, 3745.82, 3662.88, 3783.63, 3689.07, 3780.55, 3722.61
+Disk Operations: 7856, 7838, 6900, 7726, 4072, 7698, 6120, 6482, 5256, 6210, 8176, 6446, 5552, 6448, 6556
+Disk Volume: 1987.91, 1931.08, 1951.49, 2017.67, 1901.67, 2020.89, 1955.41, 1959.57, 1990.14, 2057.46, 1967.49, 2011.83, 1923.57, 1973.07, 1970.54
+Averages: Execution Time: 28.980s, RAM: 3727.19MB, Disk Ops: 6622, Disk Vol: 1974.65MB
+--------------------------------------------------------------------------------
+Database: monetdb
+Query: sudo mclient -d thesis -t performance -s "        select 	s_name, 	s_address from 	SUPPLIER, 	NATION where 	s_suppkey in ( 		select 			ps_suppkey 		from 			PARTSUPP 		where 			ps_partkey in ( 				select 					p_partkey 				from 					PART 				where 					p_name like 'forest%' 			) 			and ps_availqty > ( 				select 					0.5 * sum(l_quantity) 				from 					LINEITEM 				where 					l_partkey = ps_partkey 					and l_suppkey = ps_suppkey 					and l_shipdate >= date '1994-01-01' 					and l_shipdate < date '1994-01-01' + interval '1' year 			) 	) 	and s_nationkey = n_nationkey 	and n_name = 'CANADA' order by 	s_name; "
+Execution Times: 12.041, 12.177, 10.425, 10.300, 11.209, 12.011, 10.792, 11.008, 14.379, 19.638, 12.575, 12.060, 10.640, 10.467, 6.866
+RAM Usage: 1208.51, 1149.71, 1435.15, 1519.99, 1263.85, 1213.77, 1472.85, 1453.17, 1152.84, 1435.76, 1163.27, 1264.76, 1387.38, 1521.66, 1441.62
+Disk Operations: 27658, 27442, 27580, 27638, 27532, 27514, 27880, 27798, 27788, 27796, 27360, 28000, 27594, 27558, 27438
+Disk Volume: 2661.67, 2662.37, 2662.88, 2658.71, 2659.32, 2658.57, 2661.65, 2662.59, 2664.21, 2663.30, 2654.51, 2659.60, 2660.20, 2658.22, 2656.87
+Averages: Execution Time: 11.773s, RAM: 1338.95MB, Disk Ops: 27638, Disk Vol: 2660.31MB
+--------------------------------------------------------------------------------

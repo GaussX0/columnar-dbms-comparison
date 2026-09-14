@@ -1,0 +1,40 @@
+Database: clickhouse
+Query: clickhousectl local client --database=default --time --query "        SELECT 	S_ACCTBAL, 	S_NAME, 	N_NAME, 	P_PARTKEY, 	P_MFGR, 	S_ADDRESS, 	S_PHONE, 	S_COMMENT FROM 	PART, 	SUPPLIER, 	PARTSUPP, 	NATION, 	REGION WHERE 	P_PARTKEY = PS_PARTKEY 	AND S_SUPPKEY = PS_SUPPKEY 	AND P_SIZE = 15 	AND P_TYPE LIKE '%BRASS' 	AND S_NATIONKEY = N_NATIONKEY 	AND N_REGIONKEY = R_REGIONKEY 	AND R_NAME = 'EUROPE' 	AND PS_SUPPLYCOST = ( 		SELECT 			MIN(PS_SUPPLYCOST) 		FROM 			PARTSUPP, 			SUPPLIER, 			NATION, 			REGION 		WHERE 			P_PARTKEY = PS_PARTKEY 			AND S_SUPPKEY = PS_SUPPKEY 			AND S_NATIONKEY = N_NATIONKEY 			AND N_REGIONKEY = R_REGIONKEY 			AND R_NAME = 'EUROPE' 	) ORDER BY 	S_ACCTBAL DESC, 	N_NAME, 	S_NAME, 	P_PARTKEY LIMIT 100; "
+Execution Times: 7.144, 5.390, 7.441, 8.795, 7.270, 6.899, 6.662, 6.764, 7.186, 7.062, 6.788, 7.324, 7.375, 6.869, 6.704
+RAM Usage: 2163.82, 2133.29, 2145.63, 2142.27, 2142.49, 2139.21, 2137.98, 2138.15, 2141.88, 2139.84, 2139.44, 2160.24, 2146.31, 2143.84, 2165.06
+Disk Operations: 2622, 2630, 2320, 2426, 2348, 2318, 3060, 2908, 3502, 2644, 2156, 2318, 2368, 3006, 2532
+Disk Volume: 233.54, 242.71, 241.28, 244.09, 242.85, 242.91, 244.76, 241.82, 246.94, 245.37, 230.79, 240.21, 243.42, 242.53, 245.75
+Averages: Execution Time: 7.045s, RAM: 2145.30MB, Disk Ops: 2611, Disk Vol: 241.93MB
+--------------------------------------------------------------------------------
+Database: duckdb
+Query: duckdb tpch.duckdb -c '.timer on' -c "        SELECT 	S_ACCTBAL, 	S_NAME, 	N_NAME, 	P_PARTKEY, 	P_MFGR, 	S_ADDRESS, 	S_PHONE, 	S_COMMENT FROM 	PART, 	SUPPLIER, 	PARTSUPP, 	NATION, 	REGION WHERE 	P_PARTKEY = PS_PARTKEY 	AND S_SUPPKEY = PS_SUPPKEY 	AND P_SIZE = 15 	AND P_TYPE LIKE '%BRASS' 	AND S_NATIONKEY = N_NATIONKEY 	AND N_REGIONKEY = R_REGIONKEY 	AND R_NAME = 'EUROPE' 	AND PS_SUPPLYCOST = ( 		SELECT 			MIN(PS_SUPPLYCOST) 		FROM 			PARTSUPP, 			SUPPLIER, 			NATION, 			REGION 		WHERE 			P_PARTKEY = PS_PARTKEY 			AND S_SUPPKEY = PS_SUPPKEY 			AND S_NATIONKEY = N_NATIONKEY 			AND N_REGIONKEY = R_REGIONKEY 			AND R_NAME = 'EUROPE' 	) ORDER BY 	S_ACCTBAL DESC, 	N_NAME, 	S_NAME, 	P_PARTKEY LIMIT 100; "
+Execution Times: 0.789, 0.801, 0.825, 0.736, 0.822, 0.755, 0.758, 0.622, 0.776, 0.690, 0.754, 0.655, 0.785, 0.783, 0.759
+RAM Usage: 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30, 1580.30
+Disk Operations: 1258, 1292, 1264, 1410, 1314, 1394, 1280, 1188, 1218, 1282, 1204, 1320, 1312, 1252, 1300
+Disk Volume: 164.98, 164.87, 164.14, 164.91, 166.41, 167.90, 167.87, 164.26, 163.92, 164.14, 165.39, 166.25, 164.57, 167.73, 164.39
+Averages: Execution Time: 0.754s, RAM: 1580.30MB, Disk Ops: 1286, Disk Vol: 165.45MB
+--------------------------------------------------------------------------------
+Database: mariadb
+Query: mariadb -u root --password=qwerty -vvv -D thesis -e "        SELECT 	S_ACCTBAL, 	S_NAME, 	N_NAME, 	P_PARTKEY, 	P_MFGR, 	S_ADDRESS, 	S_PHONE, 	S_COMMENT FROM 	PART, 	SUPPLIER, 	PARTSUPP, 	NATION, 	REGION WHERE 	P_PARTKEY = PS_PARTKEY 	AND S_SUPPKEY = PS_SUPPKEY 	AND P_SIZE = 15 	AND P_TYPE LIKE '%BRASS' 	AND S_NATIONKEY = N_NATIONKEY 	AND N_REGIONKEY = R_REGIONKEY 	AND R_NAME = 'EUROPE' 	AND PS_SUPPLYCOST = ( 		SELECT 			MIN(PS_SUPPLYCOST) 		FROM 			PARTSUPP, 			SUPPLIER, 			NATION, 			REGION 		WHERE 			P_PARTKEY = PS_PARTKEY 			AND S_SUPPKEY = PS_SUPPKEY 			AND S_NATIONKEY = N_NATIONKEY 			AND N_REGIONKEY = R_REGIONKEY 			AND R_NAME = 'EUROPE' 	) ORDER BY 	S_ACCTBAL DESC, 	N_NAME, 	S_NAME, 	P_PARTKEY LIMIT 100; "
+Execution Times: 4.316, 4.631, 3.996, 4.027, 4.353, 4.344, 4.511, 4.054, 4.073, 4.505, 4.148, 4.450, 4.600, 4.687, 4.609
+RAM Usage: 1660.87, 1613.41, 1685.95, 1637.78, 1629.19, 1658.93, 1617.88, 1636.38, 1659.33, 1637.23, 1607.19, 1634.15, 1623.71, 1619.94, 1625.79
+Disk Operations: 1412, 1432, 1376, 1336, 1350, 1340, 1342, 1328, 1350, 2048, 1382, 1406, 1356, 1372, 1358
+Disk Volume: 251.51, 249.31, 248.68, 248.92, 245.60, 257.51, 246.63, 246.35, 246.57, 251.04, 247.38, 257.29, 246.78, 246.62, 246.27
+Averages: Execution Time: 4.354s, RAM: 1636.52MB, Disk Ops: 1413, Disk Vol: 249.10MB
+--------------------------------------------------------------------------------
+Database: monetdb
+Query: sudo mclient -d thesis -t performance -s "        SELECT 	S_ACCTBAL, 	S_NAME, 	N_NAME, 	P_PARTKEY, 	P_MFGR, 	S_ADDRESS, 	S_PHONE, 	S_COMMENT FROM 	PART, 	SUPPLIER, 	PARTSUPP, 	NATION, 	REGION WHERE 	P_PARTKEY = PS_PARTKEY 	AND S_SUPPKEY = PS_SUPPKEY 	AND P_SIZE = 15 	AND P_TYPE LIKE '%BRASS' 	AND S_NATIONKEY = N_NATIONKEY 	AND N_REGIONKEY = R_REGIONKEY 	AND R_NAME = 'EUROPE' 	AND PS_SUPPLYCOST = ( 		SELECT 			MIN(PS_SUPPLYCOST) 		FROM 			PARTSUPP, 			SUPPLIER, 			NATION, 			REGION 		WHERE 			P_PARTKEY = PS_PARTKEY 			AND S_SUPPKEY = PS_SUPPKEY 			AND S_NATIONKEY = N_NATIONKEY 			AND N_REGIONKEY = R_REGIONKEY 			AND R_NAME = 'EUROPE' 	) ORDER BY 	S_ACCTBAL DESC, 	N_NAME, 	S_NAME, 	P_PARTKEY LIMIT 100; "
+Execution Times: 1.519, 1.629, 1.560, 1.359, 1.349, 1.282, 1.365, 1.459, 1.617, 1.399, 1.286, 2.441, 1.735, 2.442, 1.662
+RAM Usage: 1481.42, 1481.42, 1481.42, 1481.39, 1481.39, 1481.39, 1481.39, 1481.39, 1481.39, 1481.39, 1481.39, 1483.37, 1483.37, 1487.27, 1487.27
+Disk Operations: 3614, 3782, 3678, 3506, 3760, 3670, 3556, 3824, 3458, 3644, 3704, 3590, 3522, 3636, 3636
+Disk Volume: 329.82, 330.88, 325.19, 320.49, 327.42, 325.28, 326.83, 331.70, 324.28, 330.68, 327.21, 328.57, 324.64, 329.08, 326.31
+Averages: Execution Time: 1.607s, RAM: 1482.44MB, Disk Ops: 3639, Disk Vol: 327.23MB
+--------------------------------------------------------------------------------
+Database: timescaledb
+Query: psql -d thesis -c '\timing' -c "        select 	s_acctbal, 	s_name, 	n_name, 	p_partkey, 	p_mfgr, 	s_address, 	s_phone, 	s_comment from 	PART, 	SUPPLIER, 	PARTSUPP, 	NATION, 	REGION where 	p_partkey = ps_partkey 	and s_suppkey = ps_suppkey 	and p_size = 15 	and p_type like '%BRASS' 	and s_nationkey = n_nationkey 	and n_regionkey = r_regionkey 	and r_name = 'EUROPE' 	and ps_supplycost = ( 		select 			min(ps_supplycost) 		from 			PARTSUPP, 			SUPPLIER, 			NATION, 			REGION 		where 			p_partkey = ps_partkey 			and s_suppkey = ps_suppkey 			and s_nationkey = n_nationkey 			and n_regionkey = r_regionkey 			and r_name = 'EUROPE' 	) order by 	s_acctbal desc, 	n_name, 	s_name, 	p_partkey limit 100; "
+Execution Times: 7.571, 7.472, 7.622, 7.708, 7.867, 7.857, 7.604, 7.537, 7.406, 7.714, 7.953, 7.461, 7.255, 7.674, 7.405
+RAM Usage: 656.73, 655.21, 655.64, 655.25, 654.60, 656.44, 656.23, 656.11, 656.14, 656.33, 655.36, 655.14, 659.46, 654.69, 655.34
+Disk Operations: 34018, 34140, 34002, 33976, 34054, 34134, 34104, 34268, 34488, 34128, 35776, 34080, 33892, 33978, 34372
+Disk Volume: 1039.39, 1039.33, 1040.17, 1040.06, 1041.46, 1041.67, 1041.82, 1042.47, 1043.07, 1039.68, 1046.76, 1040.41, 1035.92, 1037.06, 1038.31
+Averages: Execution Time: 7.607s, RAM: 655.91MB, Disk Ops: 34227, Disk Vol: 1040.51MB
+--------------------------------------------------------------------------------
